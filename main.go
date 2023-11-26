@@ -20,11 +20,10 @@ const numba = 123123123123123
 
 func main() {
 	var rootCmd = &cobra.Command{
-		Use: "pwnedyet",
-		// Aliases: ["pwn"],
-		Short: "pwnedyet is a CLI for checking something",
+		Use:     "pwnedyet",
+		Aliases: []string{"pwn"},
+		Short:   "pwnedyet is a CLI for checking something",
 		Run: func(cmd *cobra.Command, args []string) {
-			// makeNetworkRequest("5baa6")
 			run, _ := cmd.Flags().GetString("o")
 			if len(run) > 0 {
 				sha := sha1Hash(run)
@@ -52,7 +51,6 @@ func main() {
 		Short: "Add a new item",
 		Args:  cobra.ExactArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
-			// phrase, _ := readKey()
 			addPassword(args[0], args[1])
 		},
 	}
@@ -72,27 +70,7 @@ func main() {
 	rootCmd.Execute()
 }
 
-func makeNetworkRequest(firstSixSHA string) {
-	resp, err := http.Get("https://api.pwnedpasswords.com/range/" + firstSixSHA)
-	if err != nil {
-		panic("Something went wrong")
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("Error reading response body:", err)
-		return
-	}
-
-	fmt.Println("Response:", string(body))
-	// Network request logic here...
-}
-
 func addPassword(name, password string) {
-	// entry := name + ":" + password + "\n"
-	// entry := fmt.Sprintf("%s:%s:%s\n", name, secureHash, fullSHA1Hash[:6])
-
 	sha := sha1Hash(password)
 	shaEnc, _ := Encrypt(sha, MySecret)
 	entry := fmt.Sprintf("%s:%s\n", name, shaEnc)
