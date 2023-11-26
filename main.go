@@ -20,11 +20,25 @@ const numba = 123123123123123
 
 func main() {
 	var rootCmd = &cobra.Command{
-		Use:   "pwnedyet",
+		Use: "pwnedyet",
+		// Aliases: ["pwn"],
 		Short: "pwnedyet is a CLI for checking something",
 		Run: func(cmd *cobra.Command, args []string) {
 			// makeNetworkRequest("5baa6")
-			checkPasswords()
+			run, _ := cmd.Flags().GetString("o")
+			if len(run) > 0 {
+				sha := sha1Hash(run)
+				prefix := sha[:5]
+				suffix := sha[5:]
+
+				if isPasswordPwned(prefix, suffix) {
+					fmt.Println("Password pwned 😵")
+				} else {
+					fmt.Println("No results found.")
+				}
+			} else {
+				checkPasswords()
+			}
 		},
 	}
 
@@ -53,6 +67,8 @@ func main() {
 
 	pwCmd.AddCommand(addCmd, listCmd)
 	rootCmd.AddCommand(pwCmd)
+	rootCmd.PersistentFlags().String("o", "", "Run once without saving")
+	pwn()
 	rootCmd.Execute()
 }
 
@@ -78,7 +94,6 @@ func addPassword(name, password string) {
 	// entry := fmt.Sprintf("%s:%s:%s\n", name, secureHash, fullSHA1Hash[:6])
 
 	sha := sha1Hash(password)
-	fmt.Println(sha)
 	shaEnc, _ := Encrypt(sha, MySecret)
 	entry := fmt.Sprintf("%s:%s\n", name, shaEnc)
 
@@ -139,16 +154,11 @@ func checkPasswords() {
 
 		prefix := fullSHA1[:5]
 		suffix := fullSHA1[5:]
-		fmt.Println("Checking password for", name)
+		fmt.Println("Checking", name)
 		if isPasswordPwned(prefix, suffix) {
-			text, err := ioutil.ReadFile("ascii.txt")
-			if err != nil {
-				panic(err)
-			}
-			println(string(text))
-			fmt.Println("Password for", name, " has been pwnd")
+			fmt.Println("Password pwned 😵")
 		} else {
-			fmt.Println("Password for", name, "is safe.")
+			fmt.Println("No results found.")
 		}
 	}
 	if err := scanner.Err(); err != nil {
@@ -234,4 +244,12 @@ func Decrypt(text, MySecret string) (string, error) {
 	plainText := make([]byte, len(cipherText))
 	cfb.XORKeyStream(plainText, cipherText)
 	return string(plainText), nil
+}
+
+func pwn() {
+	text, err := ioutil.ReadFile("ascii.txt")
+	if err != nil {
+		panic(err)
+	}
+	println(string(text))
 }
