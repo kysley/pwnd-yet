@@ -97,7 +97,7 @@ func addPassword(name, password string) {
 	shaEnc, _ := Encrypt(sha, MySecret)
 	entry := fmt.Sprintf("%s:%s\n", name, shaEnc)
 
-	file, err := os.OpenFile("passwords.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	file, err := os.OpenFile("pwn.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return
@@ -114,7 +114,7 @@ func addPassword(name, password string) {
 }
 
 func listPasswords() {
-	data, err := ioutil.ReadFile("passwords.txt")
+	data, err := ioutil.ReadFile("pwn.txt")
 	if err != nil {
 		fmt.Println("Error reading file:", err)
 		return
@@ -129,7 +129,7 @@ func sha1Hash(input string) string {
 }
 
 func checkPasswords() {
-	file, err := os.Open("passwords.txt")
+	file, err := os.Open("pwn.txt")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return
